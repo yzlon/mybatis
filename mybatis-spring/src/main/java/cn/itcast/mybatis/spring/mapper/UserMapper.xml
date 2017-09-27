@@ -1,0 +1,119 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="cn.itcast.mybatis.spring.mapper.UserMapper">
+	<!-- 定义sql片段 id：sql片段的唯一标识 经验：是基于单表来定义sql片段，这样的话这个sql片段可重用性才高，在sql片段中不要包括where -->
+	<sql id="query_user_where">
+		<if test="userCustom!=null">
+			<if test="userCustom.id!=null and userCustom.id!=0 ">
+				and user.id = #{userCustom.id}
+			</if>
+			<if test="userCustom.sex!=null and userCustom.sex!='' ">
+				and user.sex = #{userCustom.sex}
+			</if>
+			<if test="userCustom.userName!=null and userCustom.userName!='' ">
+				and user.username like
+				'%${userCustom.userName}%'
+			</if>
+			<!-- foreach 遍历传入的ids collection：输入对象中的集合属性 item：每个遍历生成对象 open：开始遍历时的拼接串 
+				close：结束遍历时拼接的串 separator：遍历2个对象中需要拼接的串 -->
+		</if>
+		<if test="ids!=null">
+			<foreach collection="ids" item="user_id" open="and ("
+				separator="or" close=")">
+				id = #{user_id}
+			</foreach>
+		</if>
+	</sql>
+
+	<!-- 定义一个resultMap -->
+	<!-- type:resultMap最终所映射的java类型，可以使用别名 id:对resultMap的唯一标识 -->
+	<resultMap type="cn.itcast.mybatis.spring.pojo.User" id="userResultMap">
+		<!-- id:查询结果集中唯一标识,多个列组成就要配多个id，主键 column：查询出来的列名 property：type指定的pojo中的属性名 最终就是column到property的一个映射 -->
+		<id column="id_" property="id" />
+		<!-- 普通列 -->
+		<result column="username_" property="userName" />
+	</resultMap>
+
+	<!-- 可以引用其他mapper.xml中的resultMap -->
+	<select id="findUserByIdResultMap" parameterType="int"
+		resultMap="userResultMap">
+		SELECT id id_, username username_
+		FROM USER WHERE id =
+		#{value}
+	</select>
+
+	<!-- 主键查询，只返回一条 -->
+	<!-- id标识映射文件中的sql，将sql语句封装到mappedStatement对象中，所以将id称为statement的id -->
+	<!-- parameterType指定输入参数类型 -->
+	<!-- resultType指定输结果所映射的java对象的类型 -->
+	<!-- #{}标识一个占位符 #{id}其中的id标识接入输入参数，参数名就是id，如果参数是简单类型，#{}中的参数名可以任意，可以value或其他名称 -->
+	<select id="findUserById" parameterType="int" resultType="cn.itcast.mybatis.spring.pojo.User">
+		SELECT
+		* FROM USER WHERE id = #{value}
+	</select>
+
+	<!-- 模糊查询返回多条 -->
+	<!-- ${}:表示拼接sql串，接收的参数内容不加任何修饰拼接到sql中 ，使用${}拼接sql语句，可能引起sql注入 -->
+	<!-- like '%' or 1=1 or '%' -->
+	<!-- ${value}来接收输入参数的内容，如果传入类型是简单类型，${}只能是value -->
+	<select id="findUserByUsername" parameterType="String"
+		resultType="User">
+		SELECT * FROM USER WHERE username LIKE '%${value}%';
+	</select>
+
+	<!-- 添加用户将 parameterType:指定参数类型是pojo 在#{}中指定pojo的属性名称，接收到pojo对象的属性值，mybatis通过OGNL获取对象的属性值 -->
+	<insert id="insertUser" parameterType="User">
+		<!-- 将插入的主键返回到user对象中 SELECT LAST_INSERT_ID()得到insert进去记录的主键值，只适用自增主键 -->
+		<!-- keyProperty:将查到主键值设置到parameterType指定的对象属性 -->
+		<!-- resultType:返回值的类型 -->
+		<!-- order：相对于insert的执行顺序 -->
+		<selectKey keyProperty="id" resultType="int" order="AFTER">
+			SELECT
+			LAST_INSERT_ID()
+		</selectKey>
+		INSERT INTO
+		USER(username,birthday,sex,address)
+		VALUES(#{userName},#{birthday},#{sex},#{address})
+	</insert>
+
+	<!-- 删除用户 -->
+	<delete id="deleteUser" parameterType="int">
+		delete from user where id
+		= #{id}
+	</delete>
+
+	<!-- 更新用户 -->
+	<update id="updateUser" parameterType="User">
+		update user set
+		username=#{userName}, birthday = #{birthday}, sex=#{sex},
+		address=#{address} where
+		id=#{id}
+	</update>
+
+	<!-- 用户信息的综合查询 -->
+	<select id="findUserList" parameterType="UserQueryVo"
+		resultType="UserCustom">
+		select * from user
+		<!-- where 可以自动去掉语句中的第一个and -->
+		<where>
+			<include refid="query_user_where"></include>
+		</where>
+	</select>
+
+	<!-- 用户信息的综合查询列表总数 -->
+	<select id="findUserCount" parameterType="UserQueryVo"
+		resultType="int">
+		select count(*) from user
+		<where>
+			<if test="userCustom.id!=null and userCustom.id!=0 ">
+				and id = #{userCustom.id}
+			</if>
+			<if test="userCustom.sex!=null and userCustom.sex!='' ">
+				and sex = #{userCustom.sex}
+			</if>
+			<if test="userCustom.userName!=null and userCustom.userName!='' ">
+				and username like '%${userCustom.userName}%'
+			</if>
+		</where>
+	</select>
+</mapper>

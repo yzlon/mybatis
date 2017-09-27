@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 加载属性文件 -->
+	<properties resource="db.properties">
+		<!-- 在里头还可以配置一些属性名和值,这些属性和值会优先读取，然后加载resource的，如果相同会被覆盖，最后读取Mapper.xml中parameterType的属性的值，如果相同也被覆盖 -->
+		<property name="username" value="abcd" />
+	</properties>
+
+	<!-- 全局变量定义 -->
+
+	<!-- 别名定义 -->
+	<typeAliases>
+		<!-- type:类型 alias:别名 -->
+		<typeAlias type="cn.itcast.mybatis.pojo.User" alias="User" />
+		<!-- 批量别名定义 指定包名，mybatis自动扫描包中的pojo类，自动定义别名为类名（首字母大写小写都可以） -->
+		<package name="cn.itcast.mybatis.pojo" />
+	</typeAliases>
+
+	<!-- 配置mybatis运行环境 -->
+	<environments default="development">
+		<environment id="development">
+			<!-- 使用jdbc事务管理，事务由mybatis控制 -->
+			<transactionManager type="JDBC" />
+			<dataSource type="POOLED">
+				<property name="driver" value="${jdbc.driver}" />
+				<!-- 对查询进行编码设置 -->
+				<property name="url" value="${jdbc.url}" />
+				<property name="username" value="${jdbc.username}" />
+				<property name="password" value="${jdbc.password}" />
+			</dataSource>
+		</environment>
+	</environments>
+	<!-- 加载映射文件 -->
+	<mappers>
+		<!-- 通过resource方法一次加载一个文件 -->
+		<mapper resource="cn/itcast/mybatis/first/User.xml" />
+		<!-- <mapper resource="cn/itcast/mybatis/mapper/UserMapper.xml" /> -->
+		<!-- 通过mapper接口加载映射文件，需要遵循一些规范：需要将mapper接口的类名和mapper.xml文件名称一致，且放到一个目录 
+			上面规范的前提是：使用的是mapper代理的方法 -->
+	<!-- <mapper class="cn.itcast.mybatis.mapper.UserMapper" /> -->
+		<!-- 批量加载 -->
+		<!-- mapper接口的包名，规范同上 -->
+		<package name="cn.itcast.mybatis.mapper" />
+	</mappers>
+</configuration>

@@ -1,0 +1,64 @@
+mapper.xml要在mybatis配置文件中注册
+
+mybatis介绍
+	jdbc
+	dbutils
+		自动封装结果集
+	mybatis
+	hibernate
+		基本上不用写sql语句
+	
+myabtis入门
+	导入jar包
+		mybatis
+		mysql驱动
+	建表
+	添加mybatis的配置文件config.xml
+		development:开发模式
+		work：生产模式
+		transactionManager POOLED
+	编写pojo类
+	编写mapper.xml
+	在config.xml中注册mapper
+		<mappers>
+			<mapper resource="mapper.xml的路径" />
+		</mappers>
+	
+使用：
+	1、加载配置文件config.xml
+		ins = Classloader.getResourceAsStream("config.xml");
+	2、构建sqlSessionFactory工厂
+		SqlSessionFactoryFactory factory = new SqlSessionFacoryBuilder().build(ins);
+	3、创建能执行映射文件中的sql的sqlsession
+		SqlSession session = factory.openSession();
+	4、映射sql的标识字符串
+		String statement = "com.xxx.XXMapper.select";
+		User user = session.selectOne(statement, 2);
+	
+	
+	
+mybatis整合ecache
+	分布式的缓存框架
+		redis、memached、ehcache
+	我们系统为了提高系统并发，性能，一般对系统进行分布式部署（集群部署方式）	
+	如果不使用缓存，缓存的数据在各个服务单独存储
+	缓存框架，对缓存数据集中管理
+	
+整合方法
+	mybatis提供了一个cache接口，如果要实现自己的缓存逻辑，实现cache接口的开发即可。
+	mybatis和ehcache整合
+	PerpetualCache
+	
+	加入ehcache的jar包
+		ehcache-core.jar
+		mybatis-ehcache.jar
+		
+	整合ehcache
+		配置mapper中<cache type="EhCache"/>
+		在classpath下创建ehcache.xml
+	
+	
+	
+	
+	
+	

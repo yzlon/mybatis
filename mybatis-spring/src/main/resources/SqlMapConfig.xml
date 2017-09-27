@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+	<!-- 别名定义 -->
+	<typeAliases>
+		<!-- type:类型 alias:别名 -->
+		<typeAlias type="cn.itcast.mybatis.spring.pojo.User" alias="User" />
+		<!-- 批量别名定义 指定包名，mybatis自动扫描包中的pojo类，自动定义别名为类名（首字母大写小写都可以） -->
+		<package name="cn.itcast.mybatis.spring.pojo" />
+	</typeAliases>
+	
+	<!-- 加载映射文件:使用自动扫描时，如果mapper.xml和mapper.java在同一个目录中，此处就不用定义mappers -->
+	<mappers>
+		<!-- 通过mapper接口加载映射文件，需要遵循一些规范：需要将mapper接口的类名和mapper.xml文件名称一致，且放到一个目录 
+			上面规范的前提是：使用的是mapper代理的方法 -->
+		<!-- 批量加载 -->
+		<!-- mapper接口的包名，规范同上 -->
+		<package name="cn.itcast.mybatis.spring.mapper" />
+	</mappers>
+</configuration>
